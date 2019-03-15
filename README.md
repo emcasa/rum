@@ -1,6 +1,6 @@
 # Redshift User Management
 
-Tool to help managing users, groups and schemas on AWS Redshift. It creates random passwords to new users and sent them 
+Tool to help managing users, groups and schemas on AWS Redshift. It creates random passwords to new users and send them 
 by email alongside the database credentials.
 
 ## Environmental Variables
