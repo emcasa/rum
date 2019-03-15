@@ -1,0 +1,11 @@
+Hello,
+
+Welcome! Here are your credentials to access {0} Redshift.
+
+Host: {1}
+Port: {2}
+Database: {3}
+Username: {4}
+Password: {5}
+
+Get in touch if you have any question!
