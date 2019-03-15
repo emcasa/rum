@@ -9,7 +9,7 @@ To start define the environmental variables:
 ```
 HOST: Redshift host
 USER: Superuser name (must have create user privileges
-PWD: Superuser password
+PASSWORD: Superuser password
 PORT: Redshift port
 DBNAME: Redshift database name
 (optional)SENDGRID_API_KEY: To send emails to users

@@ -34,13 +34,13 @@ class RedshiftUserManagement:
 
         # Send email to user
         if self.sendmail:
+            sendgrid = SendGrid(self.email)
             try:
-                sendgrid = SendGrid(self.email)
-            except KeyError as error:
-                raise KeyError('If you do not wish to send email to users, '
-                               'then set RedshiftUserManagement(send_mail=False).'
-                               'Otherwise, set the correct environmental variables.', error)
-            response = sendgrid.send_usercreated_mail(self.username, password)
+                response = sendgrid.send_usercreated_mail(self.username, password)
+            except Exception as error:
+                raise Exception('If you do not wish to send email to users, '
+                                'then set RedshiftUserManagement(send_mail=False).'
+                                'Otherwise, set the correct environmental variables.', error)
             if response >= 300:
                 print('Failed to send email')
 
