@@ -82,7 +82,6 @@ class RedshiftSchemaManagement:
     def create_read_only_schema(self, owner_user):
         """
         Create a new schema and add it to read_only group
-        :param schema_name: <string>
         :param owner_user: <string> user that will own the schema and have all privileges.
         :return: None
         """
@@ -99,6 +98,12 @@ class RedshiftGroupManagement:
             self.group_name = group_name
 
     def create_group(self):
+        """
+        Create a new user group
+        :return: None
+        """
         sql = open('sqls/create_group.sql').read().format(self.group_name)
         self.redshift.query(sql)
         print('Group {} created.'.format(self.group_name))
+
+        return
