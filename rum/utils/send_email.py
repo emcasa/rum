@@ -14,8 +14,8 @@ class SendGrid():
         :param content_txt: <string>
         :return: <int> status_code
         """
-        sg = sendgrid.SendGridAPIClient(apikey=os.environ['SENDGRID_API_KEY'])
-        from_email = Email(os.environ['FROM_EMAIL_ADDR'])
+        sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+        from_email = Email(os.environ.get('FROM_EMAIL_ADDR', 'test@test.com'))
         to_email = Email(self.to_email_addr)
         subject = subject_txt
         content = Content("text/plain", content_txt)
@@ -24,21 +24,21 @@ class SendGrid():
 
         return response.status_code
 
-    def send_usercreated_mail(self, user, pwd):
+    def send_usercreated_mail(self, user, password):
         """
         Send email to a user informing credentials and password.
         :param user: <string>
         :param pwd: <string>
         :return: <int> status_code
         """
-        subject = 'Credentials for account - {} Redshift'.format(os.environ['COMPANY_NAME'])
+        subject = 'Credentials for account - {} Redshift'.format(os.environ.get('COMPANY_NAME', 'My Company'))
 
         content = open('utils/templates/user_created.txt', encoding='utf-8').read()
-        content = content.format(os.environ['COMPANY_NAME'],
-                                 os.environ['HOST'],
-                                 os.environ['PORT'],
-                                 os.environ['DBNAME'],
+        content = content.format(os.environ.get('COMPANY_NAME', 'My Company'),
+                                 os.environ.get('HOST', 'localhost'),
+                                 os.environ.get('PORT', 5439),
+                                 os.environ.get('DBNAME', 'database'),
                                  user,
-                                 pwd)
+                                 password)
 
         return self._send_basetext_email(subject, content)
