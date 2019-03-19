@@ -18,7 +18,7 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Use the template_local.env to set the environment variables to a file called 
+
 local.env. Then export the env vars using:
 
 ```
