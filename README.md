@@ -18,7 +18,7 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Use the template_local.env to set the environmental variables to a file called 
+3. Use the template_local.env to set the environment variables to a file called 
 local.env. Then export the env vars using:
 
 ```
@@ -34,7 +34,7 @@ To create a new user:
 ```
 from app import RedshiftUserManagement
  
-rum = RedshiftUserManagement(<username>, <user@email.com>)
+rum = RedshiftUserManagement('<username>', '<user@email.com>')
 rum.add_user()
 >>> User <username> created with password "randompassword" (without quotes).
 ```
@@ -47,5 +47,11 @@ rum.remove_user()
 
 To create a new schema with ownership to <username>:
 ```
-create_read_only_schema(<schema_name>, <username>)
+from app import RedshiftSchemaManagement
+
+rsm = RedshiftSchemaManagement('<schema_name>')
+create_read_only_schema('<username>')
+>>> Schema <schema_name> created.
 ```
+
+

@@ -1,6 +1,7 @@
 import sendgrid
 import os
 from sendgrid.helpers.mail import *
+from python_http_client.exceptions import UnauthorizedError
 
 
 class SendGrid():
@@ -21,7 +22,16 @@ class SendGrid():
         subject = subject_txt
         content = Content("text/plain", content_txt)
         mail = Mail(self.from_email, subject, to_email, content)
-        response = self.send_grid_api.client.mail.send.post(request_body=mail.get())
+
+        try:
+            response = self.send_grid_api.client.mail.send.post(request_body=mail.get())
+        except UnauthorizedError as error:
+            raise Exception('If you do not wish to send email to users, '
+                            'then set RedshiftUserManagement(send_mail=False). '
+                            'Otherwise, set the correct environmental variables.', error)
+
+        if response >= 300:
+            print('Failed to send email')
 
         return response.status_code
 
