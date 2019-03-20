@@ -1,6 +1,7 @@
 from rum.connection.database import Redshift
 from rum.utils.password_generator import Password
 from rum.utils.send_email import SendGrid
+from rum.utils.sql_files import open_sql_file
 
 
 class RedshiftUserManagement:
@@ -11,12 +12,11 @@ class RedshiftUserManagement:
         self.sendmail = send_mail
         self.redshift = Redshift()
 
-        # Initial Setup
         if not self._read_only_group_exists():
             self.redshift.query('CREATE GROUP read_only;')
 
     def _read_only_group_exists(self):
-        sql = open('sqls/check_read_only_exists.sql').read()
+        sql = open_sql_file('check_read_only_exists')
         return self.redshift.query(sql).fetchone()[0]
 
     def add_user(self):
@@ -24,27 +24,16 @@ class RedshiftUserManagement:
         Add user to redshift, with random password and send email with connection data.
         :return: None
         """
-        # Create random password for user
         password = Password().str
 
-        # Create user
-        sql = open('sqls/create_user.sql').read().format(self.username, password)
+        sql = open_sql_file('create_user').format(self.username, password)
         self.redshift.query(sql)
         print('User {} created with password "{}" (without quotes).'.format(self.username, password))
 
-        # Send email to user
         if self.sendmail:
             sendgrid = SendGrid(self.email)
-            try:
-                response = sendgrid.send_usercreated_mail(self.username, password)
-            except Exception as error:
-                raise Exception('If you do not wish to send email to users, '
-                                'then set RedshiftUserManagement(send_mail=False).'
-                                'Otherwise, set the correct environmental variables.', error)
-            if response >= 300:
-                print('Failed to send email')
+            sendgrid.send_usercreated_mail(self.username, password)
 
-        # Add user to relevant groups
         if self.access_level == 'read_only':
             self._add_user_to_read_only_group()
 
@@ -55,7 +44,7 @@ class RedshiftUserManagement:
         Removes a user from group and then drops it
         :return: None
         """
-        sql = open('sqls/remove_user.sql').read().format(self.username)
+        sql = open_sql_file('remove_user').format(self.username)
 
         self.redshift.query(sql)
         print('User {} dropped.'.format(self.username))
@@ -64,10 +53,10 @@ class RedshiftUserManagement:
 
     def _add_user_to_read_only_group(self):
         """
-        Add a user to read only group permissions;
+        Add a user to read only group permissions
         :return: None
         """
-        sql = open('sqls/add_user_read_only_group.sql').read().format(self.username)
+        sql = open_sql_file('add_user_read_only_group').format(self.username)
         self.redshift.query(sql)
         print('User {} added to group read_only.'.format(self.username))
 
@@ -85,7 +74,7 @@ class RedshiftSchemaManagement:
         :param owner_user: <string> user that will own the schema and have all privileges.
         :return: None
         """
-        sql = open('sqls/create_read_only_schema.sql').read().format(self.schema_name, owner_user)
+        sql = open_sql_file('create_read_only_schema').format(self.schema_name, owner_user)
         self.redshift.query(sql)
         print('Schema {} created.'.format(self.schema_name))
 
@@ -102,7 +91,7 @@ class RedshiftGroupManagement:
         Create a new user group
         :return: None
         """
-        sql = open('sqls/create_group.sql').read().format(self.group_name)
+        sql = open_sql_file('create_group').format(self.group_name)
         self.redshift.query(sql)
         print('Group {} created.'.format(self.group_name))
 

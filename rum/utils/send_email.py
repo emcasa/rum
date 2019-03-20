@@ -1,11 +1,14 @@
 import sendgrid
 import os
 from sendgrid.helpers.mail import *
+from python_http_client.exceptions import UnauthorizedError
 
 
 class SendGrid():
     def __init__(self, to_email_addr):
         self.to_email_addr = to_email_addr
+        self.send_grid_api = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+        self.from_email = Email(os.environ.get('FROM_EMAIL_ADDR', 'test@test.com'))
 
     def _send_basetext_email(self, subject_txt, content_txt):
         """
@@ -14,13 +17,21 @@ class SendGrid():
         :param content_txt: <string>
         :return: <int> status_code
         """
-        sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
-        from_email = Email(os.environ.get('FROM_EMAIL_ADDR', 'test@test.com'))
+
         to_email = Email(self.to_email_addr)
         subject = subject_txt
         content = Content("text/plain", content_txt)
-        mail = Mail(from_email, subject, to_email, content)
-        response = sg.client.mail.send.post(request_body=mail.get())
+        mail = Mail(self.from_email, subject, to_email, content)
+
+        try:
+            response = self.send_grid_api.client.mail.send.post(request_body=mail.get())
+        except UnauthorizedError as error:
+            raise Exception('If you do not wish to send email to users, '
+                            'then set RedshiftUserManagement(send_mail=False). '
+                            'Otherwise, set the correct environmental variables.', error)
+
+        if response >= 300:
+            print('Failed to send email')
 
         return response.status_code
 
@@ -28,7 +39,7 @@ class SendGrid():
         """
         Send email to a user informing credentials and password.
         :param user: <string>
-        :param pwd: <string>
+        :param password: <string>
         :return: <int> status_code
         """
         subject = 'Credentials for account - {} Redshift'.format(os.environ.get('COMPANY_NAME', 'My Company'))

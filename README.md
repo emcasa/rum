@@ -3,25 +3,38 @@
 Tool to help managing users, groups and schemas on AWS Redshift. It creates random passwords to new users and send them 
 by email alongside the database credentials.
 
-## Environmental Variables
-To start define the environmental variables:
+
+## Installing the project locally
+1. Clone the repository and create a new virtual environment:
+```
+git clone https://github.com/emcasa/rum.git
+cd rum
+python3 -m virtualenv env
+source env/bin/activate
+```
+
+2. Install all dependencies by running:
+```
+pip install -r requirements.txt
+```
+
+
+local.env. Then export the env vars using:
 
 ```
-HOST: Redshift host
-USER: Superuser name (must have create user privileges
-PASSWORD: Superuser password
-PORT: Redshift port
-DBNAME: Redshift database name
-(optional)SENDGRID_API_KEY: To send emails to users
-(optional)FROM_EMAIL_ADDR: your email address, or the email you wich to send from
-(optional)COMPANY_NAME: Set with your company name
+cp template_local.env local.env
+set -a source local.env set +a
 ```
+
+4. Run the code in your preferred IDE. 
 
 ## Usage Examples 
 To create a new user:
 
 ```
-rum = RedshiftUserManagement(<username>, <user@email.com>)
+from app import RedshiftUserManagement
+ 
+rum = RedshiftUserManagement('<username>', '<user@email.com>')
 rum.add_user()
 >>> User <username> created with password "randompassword" (without quotes).
 ```
@@ -34,5 +47,11 @@ rum.remove_user()
 
 To create a new schema with ownership to <username>:
 ```
-create_read_only_schema(<schema_name>, <username>)
+from app import RedshiftSchemaManagement
+
+rsm = RedshiftSchemaManagement('<schema_name>')
+create_read_only_schema('<username>')
+>>> Schema <schema_name> created.
 ```
+
+

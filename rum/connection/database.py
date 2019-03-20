@@ -4,14 +4,15 @@ import os
 
 class Redshift(object):
     def __init__(self):
-        # Config DB credentials
+        self.connection, self.cursor = self._create_connection()
+
+    @staticmethod
+    def _create_connection():
         db_config = {'dbname': os.environ.get('DBNAME', 'database'),
                      'host': os.environ.get('HOST', 'localhost'),
                      'password': os.environ.get('PASSWORD', ''),
                      'port': os.environ.get('PORT', '5439'),
                      'user': os.environ.get('USER', 'user')}
-
-        # Connect to DB
         try:
             print('connecting to Redshift database...')
             connection = psycopg2.connect(**db_config)
@@ -23,9 +24,7 @@ class Redshift(object):
         else:
             print('connection established\n{}'.format(db_version[0]))
 
-        # Define connection and cursor objects
-        self.connection = connection
-        self.cursor = cursor
+        return connection, cursor
 
     def query(self, query):
         try:
